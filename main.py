@@ -14,8 +14,14 @@ BG_COLOR = np.array((1.0, 1.0, 1.0))
 DIFFURE = 1
 SPECULAR = 2
 
-def ray_pos(orig, dir, t):
-    return orig + t * dir
+class Ray:
+    def __init__(self, o, d):
+        self.orig = o
+        self.dir = d
+
+    def pos(self, t):
+        return self.orig + t * self.dir
+
 
 class Intersection:
     def __init__(self, p=None, t=None, m=None, n=None):
@@ -31,10 +37,10 @@ class Sphere:
         self.center = c
         self.mat = m
     
-    def intersect(self, orig, dir, isect, t_max=INFTY, t_min=EPSILON):
-        temp = orig - self.center
-        a = np.dot(dir, dir)
-        b_half = np.dot(dir, temp)
+    def intersect(self, r, isect, t_max=INFTY, t_min=EPSILON):
+        temp = r.orig - self.center
+        a = np.dot(r.dir, r.dir)
+        b_half = np.dot(r.dir, temp)
         c = np.dot(temp, temp) - self.radius**2
         D = b_half**2 - a*c
         if D < 0: return False
@@ -46,7 +52,7 @@ class Sphere:
             if t < t_min or t > t_max:
                 return False
         isect.t = t
-        isect.pos = ray_pos(orig, dir, isect.t)
+        isect.pos = r.pos(isect.t)
         n = isect.pos - self.center
         isect.normal = n / np.linalg.norm(n)
         isect.mat = self.mat
@@ -56,10 +62,10 @@ scene = []
 sphere = Sphere(2.0, np.array((0.0,0.0,-5.0)), DIFFURE)
 scene.append(sphere)
 
-def raytracing(orig, dir):
+def raytracing(r):
     for obj in scene:
         isect = Intersection()
-        if obj.intersect(orig, dir, isect):
+        if obj.intersect(r, isect):
             return isect.normal * 0.5 + 0.5
     return BG_COLOR
 
@@ -71,9 +77,9 @@ if __name__=="__main__":
             u = j / WINDOW_WIDTH * -2 + 1.0
             v = i / WINDOW_HEIGHT * -2 + 1.0
             w = -FOCAL_LENGTH
-            orig = ZERO
             dir = np.array((u*WINDOW_RATIO, v, w))
-            array[i][j] = raytracing(orig, dir)
+            r = Ray(ZERO, dir/np.linalg.norm(dir))
+            array[i][j] = raytracing(r)
     # 画像を保存
     array = 255 * (array ** INV_GAMMA) # ガンマ補正
     array = array.astype(np.uint8)    
