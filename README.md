@@ -2,8 +2,12 @@
 
 ## 概要
 
-pythonで実装したシンプルなレイトレーサーで，実行すると球オブジェクトを描画します．
-Phongのモデルによりプラスチック風の光沢を表現しています．
+Pythonで実装した非常にシンプルなレイトレーサーです．次のコマンドを実行すると，球オブジェクトをPhongの反射モデルでシェーディングした画像を生成します．
+
+```python
+pyhon main.py
+```
+
 
 <div align="center">
     <img src="img.png">
@@ -19,4 +23,4 @@ Phongのモデルによりプラスチック風の光沢を表現しています
 ## 外部ライブラリ
 
 - Numpy
-- Python Imaging Library
+- pillow
